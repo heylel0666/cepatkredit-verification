@@ -205,13 +205,9 @@
       currentSessionId = inputId;
       sessionIdUUID = session.id;
 
-      const { data: authData } = await window.supabase.auth.signInAnonymously();
-      if (authData?.user) {
-        await window.supabase.from('sessions').update({
-          anonymous_user_id: authData.user.id,
-          last_accessed: new Date().toISOString(),
-        }).eq('id', sessionIdUUID);
-      }
+      await window.supabase.from('sessions').update({
+        last_accessed: new Date().toISOString(),
+      }).eq('id', sessionIdUUID);
 
       goToStep(1);
     };
@@ -423,25 +419,24 @@
       document.getElementById('submitBtn').disabled = true;
 
       try {
-        const updateData = {
+        await window.supabase.from('sessions').update({
           status: 'IN_PROGRESS',
-          id_image_front_base64: frontImage,
-          face_image_base64: selfieImage,
           face_match_score: faceMatchScore,
           face_match_passed: faceMatchPassed,
           updated_at: new Date().toISOString(),
+        }).eq('id', sessionIdUUID);
+
+        const processBody = {
+          session_id: sessionIdUUID,
+          id_image_front_base64: frontImage,
+          face_image_base64: selfieImage,
         };
         if (backImage) {
-          updateData.id_image_back_base64 = backImage;
+          processBody.id_image_back_base64 = backImage;
         }
 
-        const { error } = await window.supabase
-          .from('sessions').update(updateData).eq('id', sessionIdUUID);
-
-        if (error) throw error;
-
         window.supabase.functions.invoke('process-session', {
-          body: { session_id: sessionIdUUID }
+          body: processBody
         }).catch(e => console.log('Processing triggered:', e.message));
 
         let attempts = 0;
