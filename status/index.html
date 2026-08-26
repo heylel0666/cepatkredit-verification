@@ -32,10 +32,6 @@
     .btn-primary { background: linear-gradient(135deg, #6463af, #4e4d9e); color: white; box-shadow: 0 4px 16px rgba(100,99,175,0.35); }
     .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(100,99,175,0.4); }
     .btn-primary:disabled { background: #d4d4e0; box-shadow: none; cursor: not-allowed; transform: none; color: #8b8ba3; }
-    .btn-primary.loading { position: relative; background: #d4d4e0; box-shadow: none; pointer-events: none; }
-    .btn-primary.loading::before { content: ''; position: absolute; inset: -3px; border-radius: 15px; background: conic-gradient(from 0deg, #31b235, #fcff00, #6463af, #31b235); animation: borderSpin 1s linear infinite; z-index: -1; }
-    .btn-primary.loading::after { content: ''; position: absolute; inset: 0; border-radius: 12px; background: #d4d4e0; z-index: -1; }
-    @keyframes borderSpin { to { transform: rotate(360deg); } }
     .btn-secondary { background: #f3f3f8; color: #555570; border: 1.5px solid #eaeaf0; }
     .btn-secondary:hover { background: #eaeaf0; border-color: #d4d4e0; }
 
@@ -114,11 +110,9 @@
       document.getElementById('errorMsg').textContent = '';
       if (!inputId) { document.getElementById('errorMsg').textContent = 'Please enter a session ID.'; return; }
       document.getElementById('checkBtn').disabled = true;
-      document.getElementById('checkBtn').classList.add('loading');
       document.getElementById('checkBtn').textContent = 'Checking...';
       const { data: session, error } = await supabase.from('sessions').select('session_id, status, first_name, last_name, document_type, document_number, date_of_birth, gender, issuing_state, created_at, updated_at').eq('session_id', inputId).single();
       document.getElementById('checkBtn').disabled = false;
-      document.getElementById('checkBtn').classList.remove('loading');
       document.getElementById('checkBtn').textContent = 'Check Status';
       if (error || !session) { document.getElementById('errorMsg').textContent = 'Session not found.'; return; }
       showResult(session);
