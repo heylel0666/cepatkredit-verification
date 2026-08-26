@@ -3,59 +3,86 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Verification Status</title>
+  <title>Cepat Kredit - Verification Status</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f0f4f8; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-    .card { max-width: 420px; width: 100%; margin: 20px; background: white; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); padding: 40px 30px; text-align: center; }
-    .logo { font-size: 28px; color: #1a73e8; font-weight: 700; margin-bottom: 8px; }
-    .subtitle { color: #666; font-size: 14px; margin-bottom: 30px; }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; color: #1e293b; }
+    .container { max-width: 420px; width: 100%; margin: 20px; }
+    .card { background: white; border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); overflow: hidden; }
+    .card-header { padding: 28px 28px 0; text-align: center; }
+    .brand { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+    .brand-icon { width: 36px; height: 36px; background: linear-gradient(135deg, #2563eb, #1d4ed8); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 18px; font-weight: 700; }
+    .brand-name { font-size: 20px; font-weight: 700; color: #0f172a; }
+    .header-sub { color: #64748b; font-size: 14px; margin-top: 4px; }
+    .card-body { padding: 24px 28px 28px; }
+
     .input-group { margin-bottom: 20px; text-align: left; }
-    .input-group label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 14px; color: #333; }
-    .input-group input { width: 100%; padding: 12px 14px; border: 1.5px solid #ddd; border-radius: 8px; font-size: 15px; outline: none; transition: border 0.2s; }
-    .input-group input:focus { border-color: #1a73e8; }
-    .btn { padding: 13px 24px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%; background: #1a73e8; color: white; transition: background 0.2s; }
-    .btn:hover { background: #1557b0; }
-    .btn:disabled { background: #ccc; cursor: not-allowed; }
-    .result { margin-top: 30px; }
-    .status-badge { display: inline-block; padding: 8px 20px; border-radius: 20px; font-size: 14px; font-weight: 600; margin-bottom: 16px; }
-    .status-pending { background: #e8f0fe; color: #1a73e8; }
-    .status-processing { background: #fef7e0; color: #b06000; }
-    .status-review { background: #fef7e0; color: #b06000; }
-    .status-approved { background: #e6f4ea; color: #137333; }
-    .status-declined { background: #fce8e6; color: #c5221f; }
-    .status-failed { background: #fce8e6; color: #c5221f; }
-    .detail { text-align: left; margin-top: 16px; padding: 16px; background: #f8f9fa; border-radius: 10px; }
-    .detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e8eaed; font-size: 14px; }
+    .input-group label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; color: #334155; }
+    .input-group input { width: 100%; padding: 12px 14px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 15px; font-family: inherit; outline: none; transition: all 0.2s; background: #f8fafc; }
+    .input-group input:focus { border-color: #2563eb; background: white; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+
+    .btn { padding: 13px 24px; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%; transition: all 0.2s; font-family: inherit; }
+    .btn-primary { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; box-shadow: 0 4px 14px rgba(37,99,235,0.3); }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(37,99,235,0.4); }
+    .btn-primary:disabled { background: #cbd5e1; box-shadow: none; cursor: not-allowed; transform: none; }
+    .btn-secondary { background: #f1f5f9; color: #475569; }
+    .btn-secondary:hover { background: #e2e8f0; }
+
+    .status-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 18px; border-radius: 20px; font-size: 14px; font-weight: 600; }
+    .badge-pending { background: #eff6ff; color: #2563eb; }
+    .badge-processing { background: #fffbeb; color: #d97706; }
+    .badge-review { background: #fef3c7; color: #b45309; }
+    .badge-approved { background: #dcfce7; color: #15803d; }
+    .badge-declined { background: #fef2f2; color: #dc2626; }
+    .badge-failed { background: #fef2f2; color: #dc2626; }
+
+    .status-msg { color: #64748b; font-size: 14px; line-height: 1.6; margin-top: 12px; }
+
+    .detail { margin-top: 20px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; }
+    .detail-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid #f1f5f9; }
     .detail-row:last-child { border-bottom: none; }
-    .detail-label { color: #666; }
-    .detail-value { font-weight: 500; color: #333; }
-    .spinner-sm { width: 20px; height: 20px; border: 3px solid #e8eaed; border-top-color: #1a73e8; border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; vertical-align: middle; margin-right: 8px; }
+    .detail-label { color: #64748b; font-size: 13px; }
+    .detail-value { font-weight: 600; color: #0f172a; font-size: 14px; text-align: right; }
+
+    .spinner-sm { width: 18px; height: 18px; border: 2.5px solid #e2e8f0; border-top-color: #2563eb; border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; vertical-align: middle; margin-right: 6px; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .error-text { color: #ea4335; font-size: 14px; margin-top: 8px; }
-    .refresh-note { color: #999; font-size: 12px; margin-top: 16px; }
+
+    .refresh-bar { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px; background: #eff6ff; border-radius: 10px; margin-top: 16px; font-size: 13px; color: #2563eb; font-weight: 500; }
+    .error-text { color: #dc2626; font-size: 13px; margin-top: 8px; text-align: center; }
+    .icon-status { font-size: 56px; margin-bottom: 12px; }
   </style>
 </head>
 <body>
-  <div class="card">
-    <div class="logo">Cepat Kredit</div>
-    <div class="subtitle">ID Verification Status</div>
-
-    <div id="searchSection">
-      <div class="input-group">
-        <label>Session ID</label>
-        <input type="text" id="sessionIdInput" placeholder="Enter your session ID">
+  <div class="container">
+    <div class="card">
+      <div class="card-header">
+        <div class="brand">
+          <div class="brand-icon">CK</div>
+          <span class="brand-name">Cepat Kredit</span>
+        </div>
+        <p class="header-sub">Verification Status</p>
       </div>
-      <button class="btn" id="checkBtn" onclick="checkStatus()">Check Status</button>
-      <p id="errorMsg" class="error-text"></p>
-    </div>
+      <div class="card-body">
+        <div id="searchSection">
+          <div class="input-group">
+            <label>Session ID</label>
+            <input type="text" id="sessionIdInput" placeholder="Paste your session ID">
+          </div>
+          <button class="btn btn-primary" id="checkBtn" onclick="checkStatus()">Check Status</button>
+          <p id="errorMsg" class="error-text"></p>
+        </div>
 
-    <div id="resultSection" style="display:none;">
-      <div id="statusBadge"></div>
-      <div id="statusMessage"></div>
-      <div id="detailSection"></div>
-      <button class="btn" onclick="resetSearch()" style="margin-top:20px; background:#e8eaed; color:#333;">Check Another</button>
-      <p id="refreshNote" class="refresh-note"></p>
+        <div id="resultSection" style="display:none; text-align:center;">
+          <div id="statusIcon"></div>
+          <div id="statusBadge"></div>
+          <div id="statusMessage"></div>
+          <div id="detailSection"></div>
+          <div id="refreshNote"></div>
+          <button class="btn btn-secondary" onclick="resetSearch()" style="margin-top:20px;">Check Another</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -70,38 +97,18 @@
 
     const urlParams = new URLSearchParams(window.location.search);
     const urlSession = urlParams.get('session');
-    if (urlSession) {
-      document.getElementById('sessionIdInput').value = urlSession;
-      setTimeout(() => checkStatus(), 500);
-    }
+    if (urlSession) { document.getElementById('sessionIdInput').value = urlSession; setTimeout(() => checkStatus(), 500); }
 
     window.checkStatus = async function() {
       const inputId = document.getElementById('sessionIdInput').value.trim();
-      const errorMsg = document.getElementById('errorMsg');
-      errorMsg.textContent = '';
-
-      if (!inputId) {
-        errorMsg.textContent = 'Please enter a session ID.';
-        return;
-      }
-
+      document.getElementById('errorMsg').textContent = '';
+      if (!inputId) { document.getElementById('errorMsg').textContent = 'Please enter a session ID.'; return; }
       document.getElementById('checkBtn').disabled = true;
       document.getElementById('checkBtn').textContent = 'Checking...';
-
-      const { data: session, error } = await supabase
-        .from('sessions')
-        .select('session_id, status, first_name, last_name, document_type, document_number, date_of_birth, gender, issuing_state, created_at, updated_at')
-        .eq('session_id', inputId)
-        .single();
-
+      const { data: session, error } = await supabase.from('sessions').select('session_id, status, first_name, last_name, document_type, document_number, date_of_birth, gender, issuing_state, created_at, updated_at').eq('session_id', inputId).single();
       document.getElementById('checkBtn').disabled = false;
       document.getElementById('checkBtn').textContent = 'Check Status';
-
-      if (error || !session) {
-        errorMsg.textContent = 'Session not found. Please check your session ID.';
-        return;
-      }
-
+      if (error || !session) { document.getElementById('errorMsg').textContent = 'Session not found.'; return; }
       showResult(session);
     }
 
@@ -110,19 +117,20 @@
       document.getElementById('resultSection').style.display = 'block';
 
       const statusMap = {
-        'NOT_STARTED': { label: 'Not Started', cls: 'status-pending', msg: 'Your verification has not been started yet. Please complete the verification process.' },
-        'IN_PROGRESS': { label: 'Processing', cls: 'status-processing', msg: 'Your documents are being processed. Please wait...' },
-        'PROCESSING_IMAGES': { label: 'Processing', cls: 'status-processing', msg: 'We are analyzing your documents. This usually takes less than a minute.' },
-        'IN_REVIEW': { label: 'Under Review', cls: 'status-review', msg: 'Your documents have been received and are now under review by our team.' },
-        'APPROVED': { label: 'Approved', cls: 'status-approved', msg: 'Your identity has been verified. You are all set!' },
-        'DECLINED': { label: 'Declined', cls: 'status-declined', msg: 'Your verification was not approved. Please contact support for assistance.' },
-        'PROCESSING_FAILED': { label: 'Failed', cls: 'status-failed', msg: 'An error occurred while processing your documents. Please try again.' },
+        'NOT_STARTED': { icon: '⏳', label: 'Not Started', cls: 'badge-pending', msg: 'Your verification has not been started yet.' },
+        'IN_PROGRESS': { icon: '⚙️', label: 'Processing', cls: 'badge-processing', msg: 'Your documents are being processed. Please wait...' },
+        'PROCESSING_IMAGES': { icon: '⚙️', label: 'Processing', cls: 'badge-processing', msg: 'Analyzing your documents...' },
+        'IN_REVIEW': { icon: '👀', label: 'Under Review', cls: 'badge-review', msg: 'Your documents have been received and are under review by our team.' },
+        'APPROVED': { icon: '✅', label: 'Approved', cls: 'badge-approved', msg: 'Your identity has been verified. You are all set!' },
+        'DECLINED': { icon: '❌', label: 'Declined', cls: 'badge-declined', msg: 'Your verification was not approved. Please contact support.' },
+        'PROCESSING_FAILED': { icon: '❌', label: 'Failed', cls: 'badge-declined', msg: 'An error occurred. Please try again.' },
       };
 
-      const info = statusMap[session.status] || { label: session.status, cls: 'status-pending', msg: 'Unknown status.' };
+      const info = statusMap[session.status] || { icon: '❓', label: session.status, cls: 'badge-pending', msg: '' };
 
+      document.getElementById('statusIcon').innerHTML = '<div class="icon-status">' + info.icon + '</div>';
       document.getElementById('statusBadge').innerHTML = '<span class="status-badge ' + info.cls + '">' + info.label + '</span>';
-      document.getElementById('statusMessage').innerHTML = '<p style="color:#555;font-size:15px;">' + info.msg + '</p>';
+      document.getElementById('statusMessage').innerHTML = '<p class="status-msg">' + info.msg + '</p>';
 
       const showDetails = ['IN_REVIEW', 'APPROVED', 'DECLINED'].includes(session.status);
       if (showDetails) {
@@ -132,14 +140,10 @@
         if (session.document_number) rows.push(['Document Number', session.document_number]);
         if (session.date_of_birth) rows.push(['Date of Birth', session.date_of_birth]);
         if (session.gender) rows.push(['Gender', session.gender]);
-        if (session.issuing_state) rows.push(['Issuing State', session.issuing_state]);
-        rows.push(['Submitted', new Date(session.created_at).toLocaleString()]);
-
+        rows.push(['Submitted', new Date(session.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })]);
         if (rows.length > 0) {
           let html = '<div class="detail">';
-          for (const [label, value] of rows) {
-            html += '<div class="detail-row"><span class="detail-label">' + label + '</span><span class="detail-value">' + value + '</span></div>';
-          }
+          for (const [label, value] of rows) html += '<div class="detail-row"><span class="detail-label">' + label + '</span><span class="detail-value">' + value + '</span></div>';
           html += '</div>';
           document.getElementById('detailSection').innerHTML = html;
         }
@@ -148,23 +152,13 @@
       if (pollTimer) clearInterval(pollTimer);
       if (['NOT_STARTED', 'IN_PROGRESS', 'PROCESSING_IMAGES'].includes(session.status)) {
         let count = 0;
-        document.getElementById('refreshNote').innerHTML = '<span class="spinner-sm"></span> Auto-refreshing every 3 seconds...';
+        document.getElementById('refreshNote').innerHTML = '<div class="refresh-bar"><span class="spinner-sm"></span> Auto-refreshing...</div>';
         pollTimer = setInterval(async () => {
           count++;
-          if (count > 60) { clearInterval(pollTimer); document.getElementById('refreshNote').textContent = ''; return; }
-          const { data } = await supabase
-            .from('sessions')
-            .select('session_id, status, first_name, last_name, document_type, document_number, date_of_birth, gender, issuing_state, created_at, updated_at')
-            .eq('session_id', session.session_id)
-            .single();
-          if (data && ['IN_REVIEW', 'APPROVED', 'DECLINED', 'PROCESSING_FAILED'].includes(data.status)) {
-            clearInterval(pollTimer);
-            document.getElementById('refreshNote').textContent = '';
-            showResult(data);
-          }
+          if (count > 60) { clearInterval(pollTimer); document.getElementById('refreshNote').innerHTML = ''; return; }
+          const { data } = await supabase.from('sessions').select('session_id, status, first_name, last_name, document_type, document_number, date_of_birth, gender, issuing_state, created_at, updated_at').eq('session_id', session.session_id).single();
+          if (data && ['IN_REVIEW', 'APPROVED', 'DECLINED', 'PROCESSING_FAILED'].includes(data.status)) { clearInterval(pollTimer); document.getElementById('refreshNote').innerHTML = ''; showResult(data); }
         }, 3000);
-      } else {
-        document.getElementById('refreshNote').textContent = '';
       }
     }
 

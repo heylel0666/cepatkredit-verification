@@ -3,156 +3,201 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Identity Verification</title>
+  <title>Cepat Kredit - Identity Verification</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.13/dist/face-api.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f0f4f8; min-height: 100vh; }
-    .container { max-width: 480px; margin: 0 auto; padding: 20px; min-height: 100vh; background: white; }
-    .header { text-align: center; padding: 30px 0; }
-    .header h1 { color: #1a73e8; font-size: 24px; margin-bottom: 8px; }
-    .header p { color: #666; font-size: 14px; }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%); min-height: 100vh; color: #1e293b; }
+    .container { max-width: 440px; margin: 0 auto; padding: 16px; min-height: 100vh; }
+    .card { background: white; border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); overflow: hidden; margin-bottom: 16px; }
+    .card-header { padding: 28px 28px 0; text-align: center; }
+    .brand { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+    .brand-icon { width: 36px; height: 36px; background: linear-gradient(135deg, #2563eb, #1d4ed8); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 18px; font-weight: 700; }
+    .brand-name { font-size: 20px; font-weight: 700; color: #0f172a; }
+    .header-sub { color: #64748b; font-size: 14px; margin-top: 4px; }
+    .card-body { padding: 24px 28px 28px; }
+
+    .progress-bar { height: 3px; background: #e2e8f0; border-radius: 2px; margin-bottom: 28px; overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, #2563eb, #3b82f6); border-radius: 2px; transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+
     .step { display: none; }
-    .step.active { display: block; }
-    .step-title { font-size: 18px; font-weight: 600; margin-bottom: 10px; color: #333; }
-    .step-desc { color: #666; font-size: 14px; margin-bottom: 20px; }
-    .upload-area { border: 2px dashed #ccc; border-radius: 12px; padding: 40px; text-align: center; cursor: pointer; transition: all 0.3s; margin-bottom: 20px; }
-    .upload-area:hover { border-color: #1a73e8; background: #e8f0fe; }
-    .upload-area.has-image { border-color: #34a853; background: #e6f4ea; }
-    .upload-icon { font-size: 48px; margin-bottom: 10px; }
-    .preview-img { max-width: 100%; max-height: 300px; border-radius: 8px; margin: 10px 0; }
-    .btn { padding: 14px 28px; border: none; border-radius: 8px; font-size: 16px; font-weight: 500; cursor: pointer; width: 100%; transition: all 0.3s; }
-    .btn-primary { background: #1a73e8; color: white; }
-    .btn-primary:hover { background: #1557b0; }
-    .btn-primary:disabled { background: #ccc; cursor: not-allowed; }
-    .btn-secondary { background: #e8eaed; color: #333; margin-top: 10px; }
-    .progress-bar { height: 4px; background: #e8eaed; border-radius: 2px; margin-bottom: 30px; overflow: hidden; }
-    .progress-fill { height: 100%; background: #1a73e8; border-radius: 2px; transition: width 0.5s ease; }
-    .camera-container { position: relative; width: 100%; border-radius: 12px; overflow: hidden; margin-bottom: 20px; background: #000; }
-    .camera-container video { width: 100%; display: block; }
-    .camera-container canvas { display: none; }
-    .face-guide { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 200px; height: 260px; border: 3px solid rgba(255,255,255,0.7); border-radius: 50%; pointer-events: none; }
-    .status-screen { text-align: center; padding: 60px 20px; }
-    .status-icon { font-size: 64px; margin-bottom: 20px; }
-    .spinner { width: 48px; height: 48px; border: 4px solid #e8eaed; border-top-color: #1a73e8; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .error-text { color: #ea4335; font-size: 14px; margin-top: 10px; }
-    .success-text { color: #34a853; font-size: 14px; margin-top: 10px; }
-    .warning-text { color: #f9ab00; font-size: 14px; margin-top: 10px; }
+    .step.active { display: block; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    .step-badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; background: #eff6ff; color: #2563eb; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 12px; }
+    .step-title { font-size: 20px; font-weight: 700; color: #0f172a; margin-bottom: 6px; }
+    .step-desc { color: #64748b; font-size: 14px; line-height: 1.5; margin-bottom: 24px; }
+
     .input-group { margin-bottom: 20px; }
-    .input-group label { display: block; margin-bottom: 5px; font-weight: 500; font-size: 14px; }
-    .input-group input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
-    .match-result { padding: 15px; border-radius: 8px; margin: 15px 0; text-align: center; font-weight: 500; }
-    .match-pass { background: #e6f4ea; color: #137333; border: 1px solid #34a853; }
-    .match-fail { background: #fce8e6; color: #c5221f; border: 1px solid #ea4335; }
-    .match-checking { background: #e8f0fe; color: #1a73e8; border: 1px solid #1a73e8; }
+    .input-group label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; color: #334155; }
+    .input-group input { width: 100%; padding: 12px 14px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 15px; font-family: inherit; outline: none; transition: all 0.2s; background: #f8fafc; }
+    .input-group input:focus { border-color: #2563eb; background: white; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+
+    .upload-area { border: 2px dashed #cbd5e1; border-radius: 16px; padding: 36px 20px; text-align: center; cursor: pointer; transition: all 0.3s; background: #f8fafc; }
+    .upload-area:hover { border-color: #2563eb; background: #eff6ff; }
+    .upload-area.has-image { border-color: #16a34a; background: #f0fdf4; border-style: solid; }
+    .upload-icon { width: 56px; height: 56px; background: #eff6ff; border-radius: 14px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; font-size: 24px; }
+    .upload-area.has-image .upload-icon { background: #dcfce7; }
+    .upload-text { font-size: 14px; font-weight: 500; color: #475569; }
+    .upload-hint { font-size: 12px; color: #94a3b8; margin-top: 4px; }
+    .preview-img { width: 100%; max-height: 240px; object-fit: contain; border-radius: 10px; margin: 0; }
+
+    .btn { padding: 13px 24px; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%; transition: all 0.2s; font-family: inherit; }
+    .btn-primary { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; box-shadow: 0 4px 14px rgba(37,99,235,0.3); }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(37,99,235,0.4); }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary:disabled { background: #cbd5e1; box-shadow: none; cursor: not-allowed; transform: none; }
+    .btn-secondary { background: #f1f5f9; color: #475569; }
+    .btn-secondary:hover { background: #e2e8f0; }
+    .btn-ghost { background: transparent; color: #64748b; padding: 8px 16px; }
+    .btn-ghost:hover { color: #334155; }
+    .btn-row { display: flex; gap: 10px; margin-top: 12px; }
+    .btn-row .btn { flex: 1; }
+
+    .camera-wrap { border-radius: 16px; overflow: hidden; margin-bottom: 20px; background: #0f172a; position: relative; }
+    .camera-wrap video { width: 100%; display: block; }
+    .camera-wrap canvas { display: none; }
+    .face-guide { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 180px; height: 230px; border: 3px solid rgba(255,255,255,0.5); border-radius: 50%; pointer-events: none; }
+    .face-guide::after { content: ''; position: absolute; inset: -8px; border: 2px dashed rgba(255,255,255,0.2); border-radius: 50%; }
+
+    .spinner { width: 40px; height: 40px; border: 3px solid #e2e8f0; border-top-color: #2563eb; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .match-result { padding: 16px; border-radius: 12px; margin: 16px 0; text-align: center; font-weight: 600; font-size: 15px; }
+    .match-pass { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+    .match-fail { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+    .match-checking { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+
+    .review-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+    .review-item { border-radius: 12px; overflow: hidden; background: #f1f5f9; }
+    .review-item.full { grid-column: 1 / -1; }
+    .review-item img { width: 100%; height: 160px; object-fit: cover; }
+    .review-label { padding: 8px 12px; font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    .status-screen { text-align: center; padding: 48px 20px; }
+    .status-icon { font-size: 56px; margin-bottom: 16px; }
+    .success-card { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 14px; padding: 16px; margin: 16px 0; text-align: left; }
+    .session-box { background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; margin-top: 10px; }
+    .session-id { font-size: 13px; font-family: 'SF Mono', 'Fira Code', monospace; color: #0f172a; word-break: break-all; line-height: 1.4; }
+    .btn-status { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 14px; margin-top: 16px; transition: all 0.2s; }
+    .btn-status:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(37,99,235,0.3); }
+    .error-card { background: #fef2f2; border: 1px solid #fecaca; border-radius: 14px; padding: 20px; margin-top: 16px; }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="header">
-      <h1>Identity Verification</h1>
-      <p>Verify your identity in 3 easy steps</p>
-    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="brand">
+          <div class="brand-icon">CK</div>
+          <span class="brand-name">Cepat Kredit</span>
+        </div>
+        <p class="header-sub">Secure Identity Verification</p>
+      </div>
+      <div class="card-body">
+        <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 0%"></div></div>
 
-    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 0%"></div></div>
+        <!-- Step 0: Session Entry -->
+        <div class="step active" id="step0">
+          <div class="step-badge">Welcome</div>
+          <div class="step-title">Get Started</div>
+          <div class="step-desc">Enter your session ID to begin verification.</div>
+          <div class="input-group">
+            <label>Session ID</label>
+            <input type="text" id="sessionIdInput" placeholder="Paste your session ID here">
+          </div>
+          <button class="btn btn-primary" onclick="startSession()">Begin Verification</button>
+          <p id="step0Error" style="color:#dc2626;font-size:13px;margin-top:12px;text-align:center;"></p>
+        </div>
 
-    <!-- Step 0: Session Entry -->
-    <div class="step active" id="step0">
-      <div class="step-title">Enter Session ID</div>
-      <div class="step-desc">Enter the session ID provided to you, or click the link from your provider.</div>
-      <div class="input-group">
-        <label>Session ID</label>
-        <input type="text" id="sessionIdInput" placeholder="Enter your session ID">
-      </div>
-      <button class="btn btn-primary" onclick="startSession()">Start Verification</button>
-      <p id="step0Error" class="error-text"></p>
-    </div>
+        <!-- Step 1: Upload ID Front -->
+        <div class="step" id="step1">
+          <div class="step-badge">Step 1 of 3</div>
+          <div class="step-title">Front of ID</div>
+          <div class="step-desc">Take a clear photo or upload the front of your government-issued ID.</div>
+          <div class="upload-area" id="frontUpload" onclick="document.getElementById('frontInput').click()">
+            <div class="upload-icon">🪪</div>
+            <p class="upload-text">Tap to capture or upload</p>
+            <p class="upload-hint">Passport, license, or national ID</p>
+          </div>
+          <input type="file" id="frontInput" accept="image/*" capture="environment" style="display:none" onchange="handleImageUpload(event, 'front')">
+          <button class="btn btn-primary" id="step1Next" disabled onclick="goToStep(2)">Continue</button>
+        </div>
 
-    <!-- Step 1: Upload ID Front -->
-    <div class="step" id="step1">
-      <div class="step-title">Step 1: Front of ID</div>
-      <div class="step-desc">Take a photo or upload the front of your government-issued ID (passport, license, national ID).</div>
-      <div class="upload-area" id="frontUpload" onclick="document.getElementById('frontInput').click()">
-        <div class="upload-icon">🪪</div>
-        <p>Tap to capture or upload</p>
-      </div>
-      <input type="file" id="frontInput" accept="image/*" capture="environment" style="display:none" onchange="handleImageUpload(event, 'front')">
-      <button class="btn btn-primary" id="step1Next" disabled onclick="goToStep(2)">Continue</button>
-    </div>
+        <!-- Step 2: Upload ID Back (optional) -->
+        <div class="step" id="step2">
+          <div class="step-badge">Step 2 of 3</div>
+          <div class="step-title">Back of ID</div>
+          <div class="step-desc">If your ID has a back side, capture it for better verification.</div>
+          <div class="upload-area" id="backUpload" onclick="document.getElementById('backInput').click()">
+            <div class="upload-icon">🔄</div>
+            <p class="upload-text">Tap to capture or upload</p>
+            <p class="upload-hint">Optional</p>
+          </div>
+          <input type="file" id="backInput" accept="image/*" capture="environment" style="display:none" onchange="handleImageUpload(event, 'back')">
+          <button class="btn btn-primary" onclick="goToStep(3)">Continue</button>
+          <button class="btn btn-secondary" onclick="goToStep(3)" style="margin-top:8px;">Skip this step</button>
+        </div>
 
-    <!-- Step 2: Upload ID Back (optional) -->
-    <div class="step" id="step2">
-      <div class="step-title">Step 2: Back of ID (Optional)</div>
-      <div class="step-desc">If your ID has a back side, capture it for better verification.</div>
-      <div class="upload-area" id="backUpload" onclick="document.getElementById('backInput').click()">
-        <div class="upload-icon">🔄</div>
-        <p>Tap to capture or upload (optional)</p>
-      </div>
-      <input type="file" id="backInput" accept="image/*" capture="environment" style="display:none" onchange="handleImageUpload(event, 'back')">
-      <button class="btn btn-primary" onclick="goToStep(3)">Continue</button>
-      <button class="btn btn-secondary" onclick="goToStep(3)">Skip this step</button>
-    </div>
+        <!-- Step 3: Selfie -->
+        <div class="step" id="step3">
+          <div class="step-badge">Step 3 of 3</div>
+          <div class="step-title">Take a Selfie</div>
+          <div class="step-desc">Position your face inside the circle and take a photo.</div>
+          <div class="camera-wrap" id="cameraContainer">
+            <video id="cameraVideo" autoplay playsinline></video>
+            <div class="face-guide"></div>
+            <canvas id="cameraCanvas"></canvas>
+          </div>
+          <button class="btn btn-primary" id="captureBtn" onclick="captureSelfie()">Take Selfie</button>
+          <div id="selfiePreview" class="hidden" style="text-align:center;">
+            <img id="selfiePreviewImg" class="preview-img" style="border-radius:16px;margin-bottom:12px;">
+            <button class="btn btn-secondary" onclick="retakeSelfie()">Retake</button>
+          </div>
+        </div>
 
-    <!-- Step 3: Selfie -->
-    <div class="step" id="step3">
-      <div class="step-title">Step 3: Take a Selfie</div>
-      <div class="step-desc">Position your face inside the circle and take a photo. Make sure your face is clearly visible.</div>
-      <div class="camera-container" id="cameraContainer">
-        <video id="cameraVideo" autoplay playsinline></video>
-        <div class="face-guide"></div>
-        <canvas id="cameraCanvas"></canvas>
-      </div>
-      <button class="btn btn-primary" id="captureBtn" onclick="captureSelfie()">📸 Take Selfie</button>
-      <div id="selfiePreview" class="hidden" style="text-align:center;">
-        <img id="selfiePreviewImg" class="preview-img">
-        <button class="btn btn-secondary" onclick="retakeSelfie()">Retake</button>
-      </div>
-    </div>
+        <!-- Step 4: Face Match -->
+        <div class="step" id="step4">
+          <div class="step-badge">Verifying</div>
+          <div class="step-title">Face Match</div>
+          <div class="step-desc">Comparing your ID photo with your selfie...</div>
+          <div id="faceMatchSpinner" style="text-align:center;">
+            <div class="spinner"></div>
+            <p style="color:#64748b;font-size:14px;">Loading face recognition model...</p>
+          </div>
+          <div id="faceMatchResult"></div>
+        </div>
 
-    <!-- Step 4: Face Match Check -->
-    <div class="step" id="step4">
-      <div class="step-title">Verifying Face Match</div>
-      <div class="step-desc">Comparing your ID photo with your selfie...</div>
-      <div id="faceMatchResult"></div>
-      <div id="faceMatchSpinner" style="text-align:center;">
-        <div class="spinner"></div>
-        <p style="color:#666;">Loading face recognition model...</p>
-      </div>
-    </div>
+        <!-- Step 5: Review & Submit -->
+        <div class="step" id="step5">
+          <div class="step-badge">Review</div>
+          <div class="step-title">Confirm & Submit</div>
+          <div class="step-desc">Review your images before submitting.</div>
+          <div id="faceMatchSummary"></div>
+          <div class="review-grid">
+            <div class="review-item full"><div class="review-label">ID Front</div><img id="reviewFront"></div>
+            <div class="review-item full" id="reviewBackContainer"><div class="review-label">ID Back</div><img id="reviewBack"></div>
+            <div class="review-item full"><div class="review-label">Selfie</div><img id="reviewSelfie"></div>
+          </div>
+          <button class="btn btn-primary" id="submitBtn" onclick="submitVerification()">Submit Verification</button>
+        </div>
 
-    <!-- Step 5: Submit -->
-    <div class="step" id="step5">
-      <div class="step-title">Submit for Verification</div>
-      <div class="step-desc">Review your images and submit.</div>
-      <div id="faceMatchSummary"></div>
-      <div style="margin-bottom: 20px;">
-        <h4 style="margin-bottom: 10px;">ID Front:</h4>
-        <img id="reviewFront" class="preview-img">
-      </div>
-      <div id="reviewBackContainer" style="margin-bottom: 20px;">
-        <h4 style="margin-bottom: 10px;">ID Back:</h4>
-        <img id="reviewBack" class="preview-img">
-      </div>
-      <div style="margin-bottom: 20px;">
-        <h4 style="margin-bottom: 10px;">Selfie:</h4>
-        <img id="reviewSelfie" class="preview-img">
-      </div>
-      <button class="btn btn-primary" id="submitBtn" onclick="submitVerification()">Submit Verification</button>
-    </div>
+        <!-- Processing -->
+        <div class="step" id="stepProcessing">
+          <div class="status-screen">
+            <div class="spinner" style="width:56px;height:56px;border-width:4px;"></div>
+            <div class="step-title">Processing</div>
+            <div class="step-desc">We're verifying your identity. This may take a moment...</div>
+          </div>
+        </div>
 
-    <!-- Processing -->
-    <div class="step" id="stepProcessing">
-      <div class="status-screen">
-        <div class="spinner"></div>
-        <div class="step-title">Processing Your Documents</div>
-        <div class="step-desc">We're verifying your identity. This may take a moment...</div>
+        <!-- Result -->
+        <div class="step" id="stepResult">
+          <div class="status-screen" id="resultContent"></div>
+        </div>
       </div>
-    </div>
-
-    <!-- Result -->
-    <div class="step" id="stepResult">
-      <div class="status-screen" id="resultContent"></div>
     </div>
   </div>
 
@@ -172,7 +217,6 @@
     let faceMatchScore = null;
     let faceMatchPassed = false;
 
-    // Check URL for session ID
     const urlParams = new URLSearchParams(window.location.search);
     const urlSession = urlParams.get('session');
     if (urlSession) {
@@ -183,32 +227,13 @@
     window.startSession = async function() {
       const inputId = document.getElementById('sessionIdInput').value.trim();
       document.getElementById('step0Error').textContent = '';
-
-      if (!inputId) {
-        document.getElementById('step0Error').textContent = 'Please enter a session ID';
-        return;
-      }
-
-      const { data: session, error } = await window.supabase
-        .from('sessions').select('*').eq('session_id', inputId).single();
-
-      if (error || !session) {
-        document.getElementById('step0Error').textContent = 'Session not found. Please check your ID.';
-        return;
-      }
-
-      if (session.status !== 'NOT_STARTED') {
-        document.getElementById('step0Error').textContent = 'This session has already been used or is expired.';
-        return;
-      }
-
+      if (!inputId) { document.getElementById('step0Error').textContent = 'Please enter a session ID'; return; }
+      const { data: session, error } = await window.supabase.from('sessions').select('*').eq('session_id', inputId).single();
+      if (error || !session) { document.getElementById('step0Error').textContent = 'Session not found. Please check your ID.'; return; }
+      if (session.status !== 'NOT_STARTED') { document.getElementById('step0Error').textContent = 'This session has already been used.'; return; }
       currentSessionId = inputId;
       sessionIdUUID = session.id;
-
-      await window.supabase.from('sessions').update({
-        last_accessed: new Date().toISOString(),
-      }).eq('id', sessionIdUUID);
-
+      await window.supabase.from('sessions').update({ last_accessed: new Date().toISOString() }).eq('id', sessionIdUUID);
       goToStep(1);
     };
 
@@ -216,41 +241,32 @@
       document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
       document.getElementById('step' + step).classList.add('active');
       document.getElementById('progressFill').style.width = ((step) / 5 * 100) + '%';
-
       if (step === 3) startCamera();
     };
 
     window.handleImageUpload = function(event, type) {
       const file = event.target.files[0];
       if (!file) return;
-
       const reader = new FileReader();
       reader.onload = function(e) {
         const img = new Image();
         img.onload = function() {
           const canvas = document.createElement('canvas');
-          const maxW = 1200;
-          const maxH = 900;
+          const maxW = 1200, maxH = 900;
           let w = img.width, h = img.height;
-          if (w > maxW || h > maxH) {
-            const ratio = Math.min(maxW / w, maxH / h);
-            w = Math.round(w * ratio);
-            h = Math.round(h * ratio);
-          }
-          canvas.width = w;
-          canvas.height = h;
+          if (w > maxW || h > maxH) { const ratio = Math.min(maxW / w, maxH / h); w = Math.round(w * ratio); h = Math.round(h * ratio); }
+          canvas.width = w; canvas.height = h;
           canvas.getContext('2d').drawImage(img, 0, 0, w, h);
           const compressed = canvas.toDataURL('image/jpeg', 0.7);
           const base64 = compressed.split(',')[1];
-
           if (type === 'front') {
             frontImage = base64;
-            document.getElementById('frontUpload').innerHTML = '<img src="' + compressed + '" class="preview-img"><p style="color:#34a853;">Front ID captured! (' + Math.round(base64.length * 3 / 4 / 1024) + 'KB)</p>';
+            document.getElementById('frontUpload').innerHTML = '<img src="' + compressed + '" class="preview-img"><p style="color:#16a34a;font-size:13px;font-weight:600;margin-top:8px;">Captured (' + Math.round(base64.length * 3 / 4 / 1024) + 'KB)</p>';
             document.getElementById('frontUpload').classList.add('has-image');
             document.getElementById('step1Next').disabled = false;
           } else {
             backImage = base64;
-            document.getElementById('backUpload').innerHTML = '<img src="' + compressed + '" class="preview-img"><p style="color:#34a853;">Back ID captured!</p>';
+            document.getElementById('backUpload').innerHTML = '<img src="' + compressed + '" class="preview-img"><p style="color:#16a34a;font-size:13px;font-weight:600;margin-top:8px;">Captured</p>';
             document.getElementById('backUpload').classList.add('has-image');
           }
         };
@@ -261,40 +277,27 @@
 
     async function startCamera() {
       try {
-        cameraStream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } }
-        });
+        cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } } });
         document.getElementById('cameraVideo').srcObject = cameraStream;
-      } catch (err) {
-        console.error('Camera error:', err);
-        alert('Could not access camera. Please allow camera permissions and try again.');
-      }
+      } catch (err) { alert('Could not access camera. Please allow camera permissions.'); }
     }
 
     window.captureSelfie = function() {
       const video = document.getElementById('cameraVideo');
       const canvas = document.getElementById('cameraCanvas');
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
+      canvas.width = video.videoWidth; canvas.height = video.videoHeight;
       canvas.getContext('2d').drawImage(video, 0, 0);
       selfieImage = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
-
       document.getElementById('selfiePreviewImg').src = canvas.toDataURL('image/jpeg');
       document.getElementById('cameraContainer').style.display = 'none';
       document.getElementById('captureBtn').style.display = 'none';
       document.getElementById('selfiePreview').classList.remove('hidden');
-
-      if (cameraStream) {
-        cameraStream.getTracks().forEach(t => t.stop());
-      }
-
+      if (cameraStream) cameraStream.getTracks().forEach(t => t.stop());
       runFaceMatch();
     };
 
     window.retakeSelfie = function() {
-      selfieImage = null;
-      faceMatchScore = null;
-      faceMatchPassed = false;
+      selfieImage = null; faceMatchScore = null; faceMatchPassed = false;
       document.getElementById('selfiePreview').classList.add('hidden');
       document.getElementById('cameraContainer').style.display = 'block';
       document.getElementById('captureBtn').style.display = 'block';
@@ -305,110 +308,41 @@
       goToStep(4);
       document.getElementById('faceMatchSpinner').style.display = 'block';
       document.getElementById('faceMatchResult').innerHTML = '';
-
       try {
         const modelUrl = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.13/model/';
-        console.log('Loading face-api models from:', modelUrl);
-        
         await faceapi.nets.ssdMobilenetv1.loadFromUri(modelUrl);
         await faceapi.nets.faceLandmark68Net.loadFromUri(modelUrl);
         await faceapi.nets.faceRecognitionNet.loadFromUri(modelUrl);
-        console.log('Models loaded successfully');
-
-        const idImg = new Image();
-        idImg.crossOrigin = 'anonymous';
+        const idImg = new Image(); idImg.crossOrigin = 'anonymous';
         idImg.src = 'data:image/jpeg;base64,' + frontImage;
-        await new Promise((resolve, reject) => {
-          idImg.onload = resolve;
-          idImg.onerror = reject;
-        });
-
-        const selfieImg = new Image();
-        selfieImg.crossOrigin = 'anonymous';
+        await new Promise((r, j) => { idImg.onload = r; idImg.onerror = j; });
+        const selfieImg = new Image(); selfieImg.crossOrigin = 'anonymous';
         selfieImg.src = 'data:image/jpeg;base64,' + selfieImage;
-        await new Promise((resolve, reject) => {
-          selfieImg.onload = resolve;
-          selfieImg.onerror = reject;
-        });
-
-        console.log('Images loaded, detecting faces...');
-        const idDetections = await faceapi.detectSingleFace(idImg).withFaceLandmarks().withFaceDescriptor();
-        const selfieDetections = await faceapi.detectSingleFace(selfieImg).withFaceLandmarks().withFaceDescriptor();
-
+        await new Promise((r, j) => { selfieImg.onload = r; selfieImg.onerror = j; });
+        const idDet = await faceapi.detectSingleFace(idImg).withFaceLandmarks().withFaceDescriptor();
+        const selfDet = await faceapi.detectSingleFace(selfieImg).withFaceLandmarks().withFaceDescriptor();
         document.getElementById('faceMatchSpinner').style.display = 'none';
-
-        if (!idDetections) {
-          console.log('No face detected in ID');
-          document.getElementById('faceMatchResult').innerHTML = `
-            <div class="match-result match-fail">No face detected in ID image. Please retake with a clearer photo showing your face.</div>
-            <button class="btn btn-secondary" onclick="retakeSelfie()">Retake Selfie</button>
-          `;
-          return;
-        }
-
-        if (!selfieDetections) {
-          console.log('No face detected in selfie');
-          document.getElementById('faceMatchResult').innerHTML = `
-            <div class="match-result match-fail">No face detected in selfie. Please retake with your face clearly visible.</div>
-            <button class="btn btn-secondary" onclick="retakeSelfie()">Retake Selfie</button>
-          `;
-          return;
-        }
-
-        const distance = faceapi.euclideanDistance(idDetections.descriptor, selfieDetections.descriptor);
+        if (!idDet) { document.getElementById('faceMatchResult').innerHTML = '<div class="match-result match-fail">No face detected in ID. Please use a clearer photo.</div><button class="btn btn-secondary" onclick="retakeSelfie()" style="margin-top:12px;">Retake Selfie</button>'; return; }
+        if (!selfDet) { document.getElementById('faceMatchResult').innerHTML = '<div class="match-result match-fail">No face detected in selfie. Please try again.</div><button class="btn btn-secondary" onclick="retakeSelfie()" style="margin-top:12px;">Retake Selfie</button>'; return; }
+        const distance = faceapi.euclideanDistance(idDet.descriptor, selfDet.descriptor);
         const similarity = Math.max(0, Math.min(100, Math.round((1 - distance / 0.6) * 100)));
-        
-        console.log('Distance:', distance, 'Similarity:', similarity);
-        
-        faceMatchScore = similarity;
-        faceMatchPassed = distance < 0.6;
-
-        if (faceMatchPassed) {
-          document.getElementById('faceMatchResult').innerHTML = `
-            <div class="match-result match-pass">
-              Face Match: ${similarity}%<br>
-              <small>Your ID photo and selfie appear to match.</small>
-            </div>
-            <button class="btn btn-primary" onclick="proceedToSubmit()">Continue</button>
-            <button class="btn btn-secondary" onclick="retakeSelfie()">Retake Selfie</button>
-          `;
-        } else {
-          document.getElementById('faceMatchResult').innerHTML = `
-            <div class="match-result match-fail">
-              Face Match: ${similarity}%<br>
-              <small>Your ID photo and selfie don't appear to match. Please ensure you're the same person in both images.</small>
-            </div>
-            <button class="btn btn-primary" onclick="proceedToSubmit()">Continue Anyway</button>
-            <button class="btn btn-secondary" onclick="retakeSelfie()">Retake Selfie</button>
-          `;
-        }
+        faceMatchScore = similarity; faceMatchPassed = distance < 0.6;
+        const matchCls = faceMatchPassed ? 'match-pass' : 'match-fail';
+        const matchMsg = faceMatchPassed ? 'Your ID photo and selfie match.' : 'These may not be the same person.';
+        document.getElementById('faceMatchResult').innerHTML = '<div class="match-result ' + matchCls + '">' + similarity + '% Match &mdash; ' + matchMsg + '</div><div class="btn-row"><button class="btn btn-primary" onclick="proceedToSubmit()">Continue</button><button class="btn btn-secondary" onclick="retakeSelfie()">Retake</button></div>';
       } catch (err) {
-        console.error('Face match error:', err);
         document.getElementById('faceMatchSpinner').style.display = 'none';
-        document.getElementById('faceMatchResult').innerHTML = `
-          <div class="match-result match-checking">Face matching temporarily unavailable (${err.message}). You may continue with manual review.</div>
-          <button class="btn btn-primary" onclick="proceedToSubmit()">Continue Anyway</button>
-          <button class="btn btn-secondary" onclick="retakeSelfie()">Retake Selfie</button>
-        `;
-        faceMatchScore = null;
-        faceMatchPassed = false;
+        document.getElementById('faceMatchResult').innerHTML = '<div class="match-result match-checking">Face matching unavailable. You can continue for manual review.</div><div class="btn-row"><button class="btn btn-primary" onclick="proceedToSubmit()">Continue</button><button class="btn btn-secondary" onclick="retakeSelfie()">Retake</button></div>';
+        faceMatchScore = null; faceMatchPassed = false;
       }
     }
 
     window.proceedToSubmit = function() {
       document.getElementById('reviewFront').src = 'data:image/jpeg;base64,' + frontImage;
-      if (backImage) {
-        document.getElementById('reviewBack').src = 'data:image/jpeg;base64,' + backImage;
-      } else {
-        document.getElementById('reviewBackContainer').style.display = 'none';
-      }
+      if (backImage) { document.getElementById('reviewBack').src = 'data:image/jpeg;base64,' + backImage; } else { document.getElementById('reviewBackContainer').style.display = 'none'; }
       document.getElementById('reviewSelfie').src = 'data:image/jpeg;base64,' + selfieImage;
-
-      const summaryHtml = faceMatchScore !== null
-        ? `<div class="match-result ${faceMatchPassed ? 'match-pass' : 'match-fail'}">Face Match Score: ${faceMatchScore}%</div>`
-        : '<div class="match-result match-checking">Face match not available</div>';
-      document.getElementById('faceMatchSummary').innerHTML = summaryHtml;
-
+      const score = faceMatchScore !== null ? '<div class="match-result ' + (faceMatchPassed ? 'match-pass' : 'match-fail') + '">Face Match: ' + faceMatchScore + '%</div>' : '<div class="match-result match-checking">Face match not available</div>';
+      document.getElementById('faceMatchSummary').innerHTML = score;
       goToStep(5);
       document.getElementById('progressFill').style.width = '80%';
     };
@@ -417,56 +351,20 @@
       goToStep('Processing');
       document.getElementById('progressFill').style.width = '90%';
       document.getElementById('submitBtn').disabled = true;
-
       try {
-        const processBody = {
-          session_id: sessionIdUUID,
-          id_image_front_base64: frontImage,
-          face_image_base64: selfieImage,
-          face_match_score: faceMatchScore,
-          face_match_passed: faceMatchPassed,
-        };
-        if (backImage) {
-          processBody.id_image_back_base64 = backImage;
-        }
-
-        const { data: fnResult, error: fnError } = await window.supabase.functions.invoke('process-session', {
-          body: processBody
-        });
-
+        const processBody = { session_id: sessionIdUUID, id_image_front_base64: frontImage, face_image_base64: selfieImage, face_match_score: faceMatchScore, face_match_passed: faceMatchPassed };
+        if (backImage) processBody.id_image_back_base64 = backImage;
+        const { data: fnResult, error: fnError } = await window.supabase.functions.invoke('process-session', { body: processBody });
         document.getElementById('progressFill').style.width = '100%';
-
         if (fnError) {
-          document.getElementById('resultContent').innerHTML = `
-            <div class="status-icon">❌</div>
-            <div class="step-title">Processing Failed</div>
-            <div class="step-desc">${fnError.message || 'An error occurred.'}</div>
-            <button class="btn btn-primary" onclick="location.reload()" style="margin-top:20px;">Try Again</button>
-          `;
+          document.getElementById('resultContent').innerHTML = '<div class="status-icon">❌</div><div class="step-title">Processing Failed</div><div class="error-card"><p style="color:#dc2626;font-size:14px;">' + (fnError.message || 'An error occurred.') + '</p></div><button class="btn btn-primary" onclick="location.reload()" style="margin-top:16px;">Try Again</button>';
         } else {
-          document.getElementById('resultContent').innerHTML = `
-            <div class="status-icon">✅</div>
-            <div class="step-title">Verification Submitted!</div>
-            <div class="step-desc">Your identity documents have been processed successfully.</div>
-            <p style="margin-top:16px;color:#666;">Your submission is now under review.</p>
-            <div style="margin-top:20px;padding:14px;background:#e8f0fe;border-radius:10px;text-align:left;">
-              <p style="font-size:13px;color:#1a73e8;font-weight:600;margin-bottom:8px;">SAVE YOUR SESSION ID</p>
-              <p style="font-size:14px;color:#333;word-break:break-all;font-family:monospace;background:white;padding:8px 12px;border-radius:6px;border:1px solid #ddd;">${currentSessionId}</p>
-              <p style="font-size:12px;color:#666;margin-top:8px;">Screenshot or copy this ID to check your verification status later.</p>
-            </div>
-            <a href="https://heylel0666.github.io/cepatkredit-verification/status/?session=${currentSessionId}" style="display:inline-block;margin-top:16px;padding:12px 24px;background:#1a73e8;color:white;border-radius:8px;text-decoration:none;font-weight:500;">Check Your Status</a>
-          `;
+          document.getElementById('resultContent').innerHTML = '<div class="status-icon">✅</div><div class="step-title">Verification Submitted!</div><div class="step-desc">Your documents have been processed and are under review.</div><div class="success-card"><p style="font-size:13px;font-weight:600;color:#15803d;margin-bottom:8px;">SAVE YOUR SESSION ID</p><div class="session-box"><p class="session-id">' + currentSessionId + '</p></div><p style="font-size:12px;color:#64748b;margin-top:8px;">Screenshot or copy this ID to check your status later.</p></div><a href="https://heylel0666.github.io/cepatkredit-verification/status/?session=' + currentSessionId + '" class="btn-status">Check Your Status</a>';
         }
-
         document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
         document.getElementById('stepResult').classList.add('active');
       } catch (err) {
-        document.getElementById('resultContent').innerHTML = `
-          <div class="status-icon">❌</div>
-          <div class="step-title">Submission Failed</div>
-          <div class="step-desc">${err.message}</div>
-          <button class="btn btn-primary" onclick="location.reload()" style="margin-top:20px;">Try Again</button>
-        `;
+        document.getElementById('resultContent').innerHTML = '<div class="status-icon">❌</div><div class="step-title">Submission Failed</div><div class="error-card"><p style="color:#dc2626;font-size:14px;">' + err.message + '</p></div><button class="btn btn-primary" onclick="location.reload()" style="margin-top:16px;">Try Again</button>';
         document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
         document.getElementById('stepResult').classList.add('active');
       }
