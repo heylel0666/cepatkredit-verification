@@ -419,70 +419,41 @@
       document.getElementById('submitBtn').disabled = true;
 
       try {
-        await window.supabase.from('sessions').update({
-          status: 'IN_PROGRESS',
-          face_match_score: faceMatchScore,
-          face_match_passed: faceMatchPassed,
-          updated_at: new Date().toISOString(),
-        }).eq('id', sessionIdUUID);
-
         const processBody = {
           session_id: sessionIdUUID,
           id_image_front_base64: frontImage,
           face_image_base64: selfieImage,
+          face_match_score: faceMatchScore,
+          face_match_passed: faceMatchPassed,
         };
         if (backImage) {
           processBody.id_image_back_base64 = backImage;
         }
 
-        window.supabase.functions.invoke('process-session', {
+        const { data: fnResult, error: fnError } = await window.supabase.functions.invoke('process-session', {
           body: processBody
-        }).catch(e => console.log('Processing triggered:', e.message));
+        });
 
-        let attempts = 0;
-        const maxAttempts = 120;
-        const pollInterval = setInterval(async () => {
-          attempts++;
-          const { data: session } = await window.supabase
-            .from('sessions').select('status, error_message, first_name, last_name, document_type')
-            .eq('id', sessionIdUUID).single();
+        document.getElementById('progressFill').style.width = '100%';
 
-          if (session && (session.status === 'IN_REVIEW' || session.status === 'PROCESSING_FAILED' || session.status === 'APPROVED')) {
-            clearInterval(pollInterval);
-            document.getElementById('progressFill').style.width = '100%';
+        if (fnError) {
+          document.getElementById('resultContent').innerHTML = `
+            <div class="status-icon">❌</div>
+            <div class="step-title">Processing Failed</div>
+            <div class="step-desc">${fnError.message || 'An error occurred.'}</div>
+            <button class="btn btn-primary" onclick="location.reload()" style="margin-top:20px;">Try Again</button>
+          `;
+        } else {
+          document.getElementById('resultContent').innerHTML = `
+            <div class="status-icon">✅</div>
+            <div class="step-title">Verification Submitted!</div>
+            <div class="step-desc">Your identity documents have been processed successfully.</div>
+            <p style="margin-top:20px;color:#666;">Your submission is now under review. You will be notified once approved.</p>
+          `;
+        }
 
-            if (session.status === 'IN_REVIEW' || session.status === 'APPROVED') {
-              document.getElementById('resultContent').innerHTML = `
-                <div class="status-icon">✅</div>
-                <div class="step-title">Verification Submitted!</div>
-                <div class="step-desc">Your identity documents have been processed successfully.</div>
-                <div class="success-text">Name: ${session.first_name || ''} ${session.last_name || ''}<br>Document: ${session.document_type || 'N/A'}</div>
-                <p style="margin-top:20px;color:#666;">Your submission is now under review. You will be notified once approved.</p>
-              `;
-            } else {
-              document.getElementById('resultContent').innerHTML = `
-                <div class="status-icon">❌</div>
-                <div class="step-title">Processing Failed</div>
-                <div class="step-desc">${session.error_message || 'An error occurred while processing your documents.'}</div>
-                <button class="btn btn-primary" onclick="location.reload()" style="margin-top:20px;">Try Again</button>
-              `;
-            }
-
-            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-            document.getElementById('stepResult').classList.add('active');
-          }
-
-          if (attempts >= maxAttempts) {
-            clearInterval(pollInterval);
-            document.getElementById('resultContent').innerHTML = `
-              <div class="status-icon">⏳</div>
-              <div class="step-title">Still Processing</div>
-              <div class="step-desc">Your verification is taking longer than expected. Please check back later.</div>
-            `;
-            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-            document.getElementById('stepResult').classList.add('active');
-          }
-        }, 2000);
+        document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+        document.getElementById('stepResult').classList.add('active');
       } catch (err) {
         document.getElementById('resultContent').innerHTML = `
           <div class="status-icon">❌</div>
