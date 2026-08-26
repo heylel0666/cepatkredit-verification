@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verification Status</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f0f4f8; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    .card { max-width: 420px; width: 100%; margin: 20px; background: white; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); padding: 40px 30px; text-align: center; }
+    .logo { font-size: 28px; color: #1a73e8; font-weight: 700; margin-bottom: 8px; }
+    .subtitle { color: #666; font-size: 14px; margin-bottom: 30px; }
+    .input-group { margin-bottom: 20px; text-align: left; }
+    .input-group label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 14px; color: #333; }
+    .input-group input { width: 100%; padding: 12px 14px; border: 1.5px solid #ddd; border-radius: 8px; font-size: 15px; outline: none; transition: border 0.2s; }
+    .input-group input:focus { border-color: #1a73e8; }
+    .btn { padding: 13px 24px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%; background: #1a73e8; color: white; transition: background 0.2s; }
+    .btn:hover { background: #1557b0; }
+    .btn:disabled { background: #ccc; cursor: not-allowed; }
+    .result { margin-top: 30px; }
+    .status-badge { display: inline-block; padding: 8px 20px; border-radius: 20px; font-size: 14px; font-weight: 600; margin-bottom: 16px; }
+    .status-pending { background: #e8f0fe; color: #1a73e8; }
+    .status-processing { background: #fef7e0; color: #b06000; }
+    .status-review { background: #fef7e0; color: #b06000; }
+    .status-approved { background: #e6f4ea; color: #137333; }
+    .status-declined { background: #fce8e6; color: #c5221f; }
+    .status-failed { background: #fce8e6; color: #c5221f; }
+    .detail { text-align: left; margin-top: 16px; padding: 16px; background: #f8f9fa; border-radius: 10px; }
+    .detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e8eaed; font-size: 14px; }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-label { color: #666; }
+    .detail-value { font-weight: 500; color: #333; }
+    .spinner-sm { width: 20px; height: 20px; border: 3px solid #e8eaed; border-top-color: #1a73e8; border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; vertical-align: middle; margin-right: 8px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .error-text { color: #ea4335; font-size: 14px; margin-top: 8px; }
+    .refresh-note { color: #999; font-size: 12px; margin-top: 16px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">Cepat Kredit</div>
+    <div class="subtitle">ID Verification Status</div>
+
+    <div id="searchSection">
+      <div class="input-group">
+        <label>Session ID</label>
+        <input type="text" id="sessionIdInput" placeholder="Enter your session ID">
+      </div>
+      <button class="btn" id="checkBtn" onclick="checkStatus()">Check Status</button>
+      <p id="errorMsg" class="error-text"></p>
+    </div>
+
+    <div id="resultSection" style="display:none;">
+      <div id="statusBadge"></div>
+      <div id="statusMessage"></div>
+      <div id="detailSection"></div>
+      <button class="btn" onclick="resetSearch()" style="margin-top:20px; background:#e8eaed; color:#333;">Check Another</button>
+      <p id="refreshNote" class="refresh-note"></p>
+    </div>
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+    const SUPABASE_URL = 'https://yuhorlwmiafhupaunrun.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl1aG9ybHdtaWFmaHVwYXVucnVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc2ODk5NzksImV4cCI6MjEwMzI2NTk3OX0.2nmIj_W_hOZNcuEOKZSbZQiUF2NtIFvREdgJQ_f5wHc';
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    let pollTimer = null;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlSession = urlParams.get('session');
+    if (urlSession) {
+      document.getElementById('sessionIdInput').value = urlSession;
+      setTimeout(() => checkStatus(), 500);
+    }
+
+    window.checkStatus = async function() {
+      const inputId = document.getElementById('sessionIdInput').value.trim();
+      const errorMsg = document.getElementById('errorMsg');
+      errorMsg.textContent = '';
+
+      if (!inputId) {
+        errorMsg.textContent = 'Please enter a session ID.';
+        return;
+      }
+
+      document.getElementById('checkBtn').disabled = true;
+      document.getElementById('checkBtn').textContent = 'Checking...';
+
+      const { data: session, error } = await supabase
+        .from('sessions')
+        .select('session_id, status, first_name, last_name, document_type, document_number, date_of_birth, gender, issuing_state, created_at, updated_at')
+        .eq('session_id', inputId)
+        .single();
+
+      document.getElementById('checkBtn').disabled = false;
+      document.getElementById('checkBtn').textContent = 'Check Status';
+
+      if (error || !session) {
+        errorMsg.textContent = 'Session not found. Please check your session ID.';
+        return;
+      }
+
+      showResult(session);
+    }
+
+    function showResult(session) {
+      document.getElementById('searchSection').style.display = 'none';
+      document.getElementById('resultSection').style.display = 'block';
+
+      const statusMap = {
+        'NOT_STARTED': { label: 'Not Started', cls: 'status-pending', msg: 'Your verification has not been started yet. Please complete the verification process.' },
+        'IN_PROGRESS': { label: 'Processing', cls: 'status-processing', msg: 'Your documents are being processed. Please wait...' },
+        'PROCESSING_IMAGES': { label: 'Processing', cls: 'status-processing', msg: 'We are analyzing your documents. This usually takes less than a minute.' },
+        'IN_REVIEW': { label: 'Under Review', cls: 'status-review', msg: 'Your documents have been received and are now under review by our team.' },
+        'APPROVED': { label: 'Approved', cls: 'status-approved', msg: 'Your identity has been verified. You are all set!' },
+        'DECLINED': { label: 'Declined', cls: 'status-declined', msg: 'Your verification was not approved. Please contact support for assistance.' },
+        'PROCESSING_FAILED': { label: 'Failed', cls: 'status-failed', msg: 'An error occurred while processing your documents. Please try again.' },
+      };
+
+      const info = statusMap[session.status] || { label: session.status, cls: 'status-pending', msg: 'Unknown status.' };
+
+      document.getElementById('statusBadge').innerHTML = '<span class="status-badge ' + info.cls + '">' + info.label + '</span>';
+      document.getElementById('statusMessage').innerHTML = '<p style="color:#555;font-size:15px;">' + info.msg + '</p>';
+
+      const showDetails = ['IN_REVIEW', 'APPROVED', 'DECLINED'].includes(session.status);
+      if (showDetails) {
+        const rows = [];
+        if (session.first_name || session.last_name) rows.push(['Name', (session.first_name || '') + ' ' + (session.last_name || '')]);
+        if (session.document_type) rows.push(['Document Type', session.document_type]);
+        if (session.document_number) rows.push(['Document Number', session.document_number]);
+        if (session.date_of_birth) rows.push(['Date of Birth', session.date_of_birth]);
+        if (session.gender) rows.push(['Gender', session.gender]);
+        if (session.issuing_state) rows.push(['Issuing State', session.issuing_state]);
+        rows.push(['Submitted', new Date(session.created_at).toLocaleString()]);
+
+        if (rows.length > 0) {
+          let html = '<div class="detail">';
+          for (const [label, value] of rows) {
+            html += '<div class="detail-row"><span class="detail-label">' + label + '</span><span class="detail-value">' + value + '</span></div>';
+          }
+          html += '</div>';
+          document.getElementById('detailSection').innerHTML = html;
+        }
+      }
+
+      if (pollTimer) clearInterval(pollTimer);
+      if (['NOT_STARTED', 'IN_PROGRESS', 'PROCESSING_IMAGES'].includes(session.status)) {
+        let count = 0;
+        document.getElementById('refreshNote').innerHTML = '<span class="spinner-sm"></span> Auto-refreshing every 3 seconds...';
+        pollTimer = setInterval(async () => {
+          count++;
+          if (count > 60) { clearInterval(pollTimer); document.getElementById('refreshNote').textContent = ''; return; }
+          const { data } = await supabase
+            .from('sessions')
+            .select('session_id, status, first_name, last_name, document_type, document_number, date_of_birth, gender, issuing_state, created_at, updated_at')
+            .eq('session_id', session.session_id)
+            .single();
+          if (data && ['IN_REVIEW', 'APPROVED', 'DECLINED', 'PROCESSING_FAILED'].includes(data.status)) {
+            clearInterval(pollTimer);
+            document.getElementById('refreshNote').textContent = '';
+            showResult(data);
+          }
+        }, 3000);
+      } else {
+        document.getElementById('refreshNote').textContent = '';
+      }
+    }
+
+    window.resetSearch = function() {
+      if (pollTimer) clearInterval(pollTimer);
+      document.getElementById('searchSection').style.display = 'block';
+      document.getElementById('resultSection').style.display = 'none';
+      document.getElementById('sessionIdInput').value = '';
+      document.getElementById('errorMsg').textContent = '';
+    };
+  </script>
+</body>
+</html>
