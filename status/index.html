@@ -5,66 +5,71 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cepat Kredit - Verification Status</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: white; min-height: 100vh; display: flex; align-items: center; justify-content: center; color: #1e293b; }
-    .container { max-width: 420px; width: 100%; margin: 20px; }
-    .card { background: linear-gradient(135deg, #31b235 0%, #fcff00 50%, #31b235 100%); border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); overflow: hidden; }
-    .card-header { padding: 28px 28px 0; text-align: center; }
-    .brand { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 4px; }
-    .brand-icon { width: 36px; height: 36px; background: linear-gradient(135deg, #6463af, #5251a0); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 18px; font-weight: 700; }
-    .brand-name { font-size: 20px; font-weight: 700; color: #0f172a; }
-    .header-sub { color: #64748b; font-size: 14px; margin-top: 4px; }
-    .card-body { padding: 24px 28px 28px; }
+    body { font-family: 'Poppins', sans-serif; background: white; min-height: 100vh; display: flex; align-items: center; justify-content: center; color: #1a1a2e; }
+    .container { max-width: 440px; width: 100%; margin: 20px; }
+
+    .card { background: linear-gradient(160deg, #31b235 0%, #a8e639 35%, #fcff00 70%, #31b235 100%); border-radius: 28px; box-shadow: 0 20px 60px rgba(49,178,53,0.25), 0 4px 16px rgba(0,0,0,0.08); overflow: hidden; position: relative; }
+    .card::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.3) 0%, transparent 60%); pointer-events: none; }
+    .card-inner { background: white; margin: 6px; border-radius: 22px; padding: 32px 28px; position: relative; z-index: 1; }
+
+    .card-header { text-align: center; margin-bottom: 24px; }
+    .brand { display: inline-flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+    .brand-icon { width: 42px; height: 42px; background: linear-gradient(135deg, #6463af, #4e4d9e); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; font-weight: 800; letter-spacing: 0.5px; box-shadow: 0 4px 12px rgba(100,99,175,0.35); }
+    .brand-name { font-size: 22px; font-weight: 700; color: #1a1a2e; letter-spacing: -0.3px; }
+    .header-sub { color: #8b8ba3; font-size: 13px; font-weight: 500; margin-top: 2px; }
 
     .input-group { margin-bottom: 20px; text-align: left; }
-    .input-group label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; color: #334155; }
-    .input-group input { width: 100%; padding: 12px 14px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 15px; font-family: inherit; outline: none; transition: all 0.2s; background: #f8fafc; }
-    .input-group input:focus { border-color: #6463af; background: white; box-shadow: 0 0 0 3px rgba(100,99,175,0.1); }
+    .input-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 12px; color: #555570; text-transform: uppercase; letter-spacing: 0.5px; }
+    .input-group input { width: 100%; padding: 14px 16px; border: 2px solid #eaeaf0; border-radius: 12px; font-size: 15px; font-family: inherit; outline: none; transition: all 0.25s; background: #fafafe; }
+    .input-group input:focus { border-color: #6463af; background: white; box-shadow: 0 0 0 4px rgba(100,99,175,0.1); }
+    .input-group input::placeholder { color: #b8b8cc; }
 
-    .btn { padding: 13px 24px; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%; transition: all 0.2s; font-family: inherit; }
-    .btn-primary { background: linear-gradient(135deg, #6463af, #5251a0); color: white; box-shadow: 0 4px 14px rgba(100,99,175,0.3); }
-    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(100,99,175,0.4); }
-    .btn-primary:disabled { background: #cbd5e1; box-shadow: none; cursor: not-allowed; transform: none; }
-    .btn-secondary { background: #f1f5f9; color: #475569; }
-    .btn-secondary:hover { background: #e2e8f0; }
+    .btn { padding: 14px 24px; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%; transition: all 0.25s; font-family: inherit; letter-spacing: 0.2px; }
+    .btn-primary { background: linear-gradient(135deg, #6463af, #4e4d9e); color: white; box-shadow: 0 4px 16px rgba(100,99,175,0.35); }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(100,99,175,0.4); }
+    .btn-primary:disabled { background: #d4d4e0; box-shadow: none; cursor: not-allowed; transform: none; color: #8b8ba3; }
+    .btn-secondary { background: #f3f3f8; color: #555570; border: 1.5px solid #eaeaf0; }
+    .btn-secondary:hover { background: #eaeaf0; border-color: #d4d4e0; }
 
-    .status-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 18px; border-radius: 20px; font-size: 14px; font-weight: 600; }
-    .badge-pending { background: #f0f0ff; color: #6463af; }
+    .status-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 20px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+    .badge-pending { background: #f3f2ff; color: #6463af; }
     .badge-processing { background: #fffbeb; color: #d97706; }
     .badge-review { background: #fef3c7; color: #b45309; }
-    .badge-approved { background: #dcfce7; color: #15803d; }
-    .badge-declined { background: #fef2f2; color: #dc2626; }
-    .badge-failed { background: #fef2f2; color: #dc2626; }
+    .badge-approved { background: #e6f9e6; color: #1a8a2e; }
+    .badge-declined { background: #fff0f0; color: #dc2626; }
+    .badge-failed { background: #fff0f0; color: #dc2626; }
 
-    .status-msg { color: #64748b; font-size: 14px; line-height: 1.6; margin-top: 12px; }
+    .status-msg { color: #8b8ba3; font-size: 13px; line-height: 1.7; margin-top: 14px; }
 
-    .detail { margin-top: 20px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; }
-    .detail-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid #f1f5f9; }
+    .detail { margin-top: 20px; background: #fafafe; border-radius: 14px; border: 1.5px solid #eeeef5; overflow: hidden; }
+    .detail-row { display: flex; justify-content: space-between; align-items: center; padding: 13px 16px; border-bottom: 1px solid #f5f5fa; }
     .detail-row:last-child { border-bottom: none; }
-    .detail-label { color: #64748b; font-size: 13px; }
-    .detail-value { font-weight: 600; color: #0f172a; font-size: 14px; text-align: right; }
+    .detail-label { color: #8b8ba3; font-size: 12px; font-weight: 500; }
+    .detail-value { font-weight: 600; color: #1a1a2e; font-size: 13px; text-align: right; }
 
-    .spinner-sm { width: 18px; height: 18px; border: 2.5px solid #e2e8f0; border-top-color: #6463af; border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; vertical-align: middle; margin-right: 6px; }
+    .spinner-sm { width: 18px; height: 18px; border: 2.5px solid #f0f0f5; border-top-color: #6463af; border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; vertical-align: middle; margin-right: 6px; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    .refresh-bar { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px; background: #f0f0ff; border-radius: 10px; margin-top: 16px; font-size: 13px; color: #6463af; font-weight: 500; }
-    .error-text { color: #dc2626; font-size: 13px; margin-top: 8px; text-align: center; }
-    .icon-status { font-size: 56px; margin-bottom: 12px; }
+    .refresh-bar { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 12px; background: #f3f2ff; border-radius: 12px; margin-top: 16px; font-size: 12px; color: #6463af; font-weight: 500; }
+    .error-text { color: #dc2626; font-size: 13px; margin-top: 10px; text-align: center; }
+    .icon-status { font-size: 56px; margin-bottom: 14px; }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="card">
-      <div class="card-header">
-        <div class="brand">
-          <div class="brand-icon">CK</div>
-          <span class="brand-name">Cepat Kredit</span>
+      <div class="card-inner">
+        <div class="card-header">
+          <div class="brand">
+            <div class="brand-icon">CK</div>
+            <span class="brand-name">Cepat Kredit</span>
+          </div>
+          <p class="header-sub">Verification Status</p>
         </div>
-        <p class="header-sub">Verification Status</p>
-      </div>
-      <div class="card-body">
+
         <div id="searchSection">
           <div class="input-group">
             <label>Session ID</label>
@@ -117,16 +122,16 @@
       document.getElementById('resultSection').style.display = 'block';
 
       const statusMap = {
-        'NOT_STARTED': { icon: '⏳', label: 'Not Started', cls: 'badge-pending', msg: 'Your verification has not been started yet.' },
-        'IN_PROGRESS': { icon: '⚙️', label: 'Processing', cls: 'badge-processing', msg: 'Your documents are being processed. Please wait...' },
-        'PROCESSING_IMAGES': { icon: '⚙️', label: 'Processing', cls: 'badge-processing', msg: 'Analyzing your documents...' },
-        'IN_REVIEW': { icon: '👀', label: 'Under Review', cls: 'badge-review', msg: 'Your documents have been received and are under review by our team.' },
-        'APPROVED': { icon: '✅', label: 'Approved', cls: 'badge-approved', msg: 'Your identity has been verified. You are all set!' },
-        'DECLINED': { icon: '❌', label: 'Declined', cls: 'badge-declined', msg: 'Your verification was not approved. Please contact support.' },
-        'PROCESSING_FAILED': { icon: '❌', label: 'Failed', cls: 'badge-declined', msg: 'An error occurred. Please try again.' },
+        'NOT_STARTED': { icon: '&#9203;', label: 'Not Started', cls: 'badge-pending', msg: 'Your verification has not been started yet.' },
+        'IN_PROGRESS': { icon: '&#9881;', label: 'Processing', cls: 'badge-processing', msg: 'Your documents are being processed. Please wait...' },
+        'PROCESSING_IMAGES': { icon: '&#9881;', label: 'Processing', cls: 'badge-processing', msg: 'Analyzing your documents...' },
+        'IN_REVIEW': { icon: '&#128064;', label: 'Under Review', cls: 'badge-review', msg: 'Your documents have been received and are under review by our team.' },
+        'APPROVED': { icon: '&#9989;', label: 'Approved', cls: 'badge-approved', msg: 'Your identity has been verified. You are all set!' },
+        'DECLINED': { icon: '&#10060;', label: 'Declined', cls: 'badge-declined', msg: 'Your verification was not approved. Please contact support.' },
+        'PROCESSING_FAILED': { icon: '&#10060;', label: 'Failed', cls: 'badge-declined', msg: 'An error occurred. Please try again.' },
       };
 
-      const info = statusMap[session.status] || { icon: '❓', label: session.status, cls: 'badge-pending', msg: '' };
+      const info = statusMap[session.status] || { icon: '&#10067;', label: session.status, cls: 'badge-pending', msg: '' };
 
       document.getElementById('statusIcon').innerHTML = '<div class="icon-status">' + info.icon + '</div>';
       document.getElementById('statusBadge').innerHTML = '<span class="status-badge ' + info.cls + '">' + info.label + '</span>';
